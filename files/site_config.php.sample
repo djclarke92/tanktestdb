@@ -1,0 +1,22 @@
+<?php
+//--------------------------------------------------------------------------------------
+//
+//	TankTest Website
+//	Copyright (c) 2026 Dave Clarke
+//
+//--------------------------------------------------------------------------------------
+
+// login names and passwords
+define( 'DB_HOST_NAME', '127.0.0.1' );
+define( 'DB_USER_NAME', 'tanktest_user' );
+define( 'DB_PASSWORD', 'passw0rd' );
+define( 'DB_DATABASE_NAME', 'tanktest' );
+
+// remote mysql host (defaults to tanktest user)
+define( 'REMOTE_MYSQL_HOST', '127.0.0.1' );
+
+// logout timer in seconds
+define( 'AUTO_REFRESH_LOGOUT', 1800 );	// 1800
+
+?>
+
