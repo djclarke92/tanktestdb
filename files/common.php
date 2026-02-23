@@ -182,6 +182,9 @@ function func_convert_date_format( $date_str )
 function func_is_date_valid( $d1 )
 {
 	$expl = explode( "/", $d1 );
+	if ( !isset($expl[0]) || !isset($expl[1]) || !isset($expl[2]) )
+		return false;
+
 	$d = $expl[0];
 	$m = $expl[1];
 	$y = $expl[2];
@@ -1079,7 +1082,7 @@ class MySQLDB
 	function UpdateExaminationsTable( $new_exam, $exam_no, $cust_no, $cyl_no, $paint, $colour, $minors, $seriouss, $ext_pass, 
 		$notes, $int_pass, $ring_fitted, $ring_colour, $test_pressure, $water_cap, $mpe, $accuracy, $buret, $hydro, 
 		$repeat, $exist_mark, $new_mark, $sig_username, $exam_date, $cert_no,	$emailed_date, $reminder_date, $absence,
-		$exist_text, $new_text )
+		$exist_text, $new_text, $pdf )
 	{
 		if ( $exam_date == "" )
 			$exam_date = "00/00/0000";
@@ -1092,31 +1095,32 @@ class MySQLDB
 			return $this->AddExamination( $cust_no, $cyl_no, $paint, $colour, $minors, $seriouss, $ext_pass, 
 					$notes, $int_pass, $ring_fitted, $ring_colour, $test_pressure, $water_cap, $mpe, $accuracy, $buret, $hydro, 
 					$repeat, $exist_mark, $new_mark, $sig_username, $exam_date, $cert_no,	$emailed_date, $reminder_date, $absence,
-					$exist_text, $new_text );
+					$exist_text, $new_text, $pdf );
 		else
 			return $this->UpdateExamination( $exam_no, $cust_no, $cyl_no, $paint, $colour, $minors, $seriouss, $ext_pass, 
 					$notes, $int_pass, $ring_fitted, $ring_colour, $test_pressure, $water_cap, $mpe, $accuracy, $buret, $hydro, 
 					$repeat, $exist_mark, $new_mark, $sig_username, $exam_date, $cert_no, $emailed_date, $reminder_date, $absence,
-					$exist_text, $new_text );
+					$exist_text, $new_text, $pdf );
 	}
 
 	function AddExamination( $cust_no, $cyl_no, $paint, $colour, $minors, $seriouss, $ext_pass, 
 		$notes, $int_pass, $ring_fitted, $ring_colour, $test_pressure, $water_cap, $mpe, $accuracy, $buret, $hydro, 
 		$repeat, $exist_mark, $new_mark, $sig_username, $exam_date, $cert_no, $emailed_date, $reminder_date, $absence,
-		$exist_text, $new_text )
+		$exist_text, $new_text, $pdf )
 	{
 		$query = sprintf( "insert into examinations (ex_CustomerNo,ex_CylinderNo,ex_PaintCondition,ex_Colour,ex_MinorScratches,ex_SeriousScratches,ex_ExternalPass,
 			ex_Notes,ex_InternalPass,ex_RingFitted,ex_RingColour,ex_TestPressure,ex_WaterCapacity,ex_MPE,ex_AccuracyVerified,ex_BuretReading,ex_HydrostaticPass,
 			ex_RepeatVisual,ex_ExistingHydroMark,ex_NewHydroMark,ex_SignatoryUserName,ex_ExaminationDate,ex_PeriodicCertNo,ex_EmailedDate,ex_ReminderDate,
-			ex_AbsenceReason,ex_ExistingHydroMarkText,ex_NewHydroMarkText) 
+			ex_AbsenceReason,ex_ExistingHydroMarkText,ex_NewHydroMarkText,ex_Pdf) 
 			values(%d,%d,'%s','%s','%s','%s','%s',
 			'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',
-			'%s','%s','%s','%s','%s',%d,'%s','%s','%s','%s','%s')",
+			'%s','%s','%s','%s','%s',%d,'%s','%s','%s','%s','%s','%s')",
 			$cust_no, $cyl_no, addslashes($paint), addslashes($colour), $minors, $seriouss, $ext_pass, 
 			addslashes($notes), $int_pass, $ring_fitted, addslashes($ring_colour),addslashes($test_pressure), addslashes($water_cap), addslashes($mpe),
 			$accuracy, addslashes($buret), $hydro, 
-			$repeat, addslashes($exist_mark), addslashes($new_mark), addslashes($sig_username), func_convert_date_format($exam_date), addslashes($cert_no), 
-			func_convert_date_format($emailed_date), func_convert_date_format($reminder_date), addslashes($absence), addslashes($exist_text), addslashes($new_text) );
+			$repeat, base64_encode($exist_mark), base64_encode($new_mark), addslashes($sig_username), func_convert_date_format($exam_date), addslashes($cert_no), 
+			func_convert_date_format($emailed_date), func_convert_date_format($reminder_date), addslashes($absence), addslashes($exist_text), addslashes($new_text),
+			base64_encode($pdf) );
 		
 		$result = $this->RunQuery( $query );
 	    if ( mysqli_affected_rows($this->db_link) >= 0 )
@@ -1130,20 +1134,21 @@ class MySQLDB
 	function UpdateExamination( $exam_no, $cust_no, $cyl_no, $paint, $colour, $minors, $seriouss, $ext_pass, 
 		$notes, $int_pass, $ring_fitted, $ring_colour, $test_pressure, $water_cap, $mpe, $accuracy, $buret, $hydro, 
 		$repeat, $exist_mark, $new_mark, $sig_username, $exam_date, $cert_no, $emailed_date, $reminder_date, $absence,
-		$exist_text, $new_text )
+		$exist_text, $new_text, $pdf )
 	{
 		$query = sprintf( "update examinations set ex_CustomerNo=%d,ex_CylinderNo=%d,ex_PaintCondition='%s',ex_Colour='%s',ex_MinorScratches='%s',ex_SeriousScratches='%s',
 			ex_ExternalPass='%s',
 			ex_Notes='%s',ex_InternalPass='%s',ex_RingFitted='%s',ex_RingColour='%s',ex_TestPressure='%s',ex_WaterCapacity='%s',ex_MPE='%s',ex_AccuracyVerified='%s',
 			ex_BuretReading='%s',ex_HydrostaticPass='%s',
 			ex_RepeatVisual='%s',ex_ExistingHydroMark='%s',ex_NewHydroMark='%s',ex_SignatoryUserName='%s',ex_ExaminationDate='%s',ex_PeriodicCertNo='%s',ex_EmailedDate='%s',
-			ex_ReminderDate='%s',ex_AbsenceReason='%s',ex_ExistingHydroMarkText='%s',ex_NewHydroMarkText='%s' 
+			ex_ReminderDate='%s',ex_AbsenceReason='%s',ex_ExistingHydroMarkText='%s',ex_NewHydroMarkText='%s',ex_Pdf='%s' 
 			where ex_ExaminationNo=%d",
 			$cust_no, $cyl_no, addslashes($paint), addslashes($colour), $minors, $seriouss, $ext_pass, 
 			addslashes($notes), $int_pass, $ring_fitted, addslashes($ring_colour), addslashes($test_pressure), addslashes($water_cap), addslashes($mpe),
 			$accuracy, addslashes($buret), $hydro, 
-			$repeat, addslashes($exist_mark), addslashes($new_mark), addslashes($sig_username), func_convert_date_format($exam_date), addslashes($cert_no), 
+			$repeat, base64_encode($exist_mark), base64_encode($new_mark), addslashes($sig_username), func_convert_date_format($exam_date), addslashes($cert_no), 
 			func_convert_date_format($emailed_date), func_convert_date_format($reminder_date), addslashes($absence), addslashes($exist_text), addslashes($new_text),  
+			base64_encode($pdf), 
 			$exam_no );
 		//printf("<p>&nbsp;<br>&nbsp;<br>%s</p>", $query);
 		$result = $this->RunQuery( $query );
@@ -1161,7 +1166,7 @@ class MySQLDB
 		$query = sprintf( "select ex_ExaminationNo,ex_CustomerNo,ex_CylinderNo,ex_PaintCondition,ex_Colour,ex_MinorScratches,ex_SeriousScratches,ex_ExternalPass,
 			ex_Notes,ex_InternalPass,ex_RingFitted,ex_RingColour,ex_TestPressure,ex_WaterCapacity,ex_MPE,ex_AccuracyVerified,ex_BuretReading,ex_HydrostaticPass,
 			ex_RepeatVisual,ex_ExistingHydroMark,ex_NewHydroMark,ex_SignatoryUserName,ex_ExaminationDate,ex_PeriodicCertNo,ex_EmailedDate,ex_ReminderDate,
-			ex_AbsenceReason,ex_ExistingHydroMarkText,ex_NewHydroMarkText,
+			ex_AbsenceReason,ex_ExistingHydroMarkText,ex_NewHydroMarkText,ex_Pdf,
 			cu_Surname,cu_Firstname,cu_Address1,cu_Email,
 			cy_Specifications,cy_SerialNo,cy_Material 
 			from examinations,customers,cylinders where ex_CustomerNo=cu_CustomerNo and ex_CylinderNo=cy_CylinderNo " );
@@ -1180,9 +1185,9 @@ class MySQLDB
 				'ex_Notes'=>stripslashes($line[8]),'ex_InternalPass'=>$line[9],'ex_RingFitted'=>$line[10],'ex_RingColour'=>stripslashes($line[11]),'ex_TestPressure'=>$line[12],'ex_WaterCapacity'=>$line[13],'ex_MPE'=>$line[14],'ex_AccuracyVerified'=>$line[15],'ex_BuretReading'=>$line[16],'ex_HydrostaticPass'=>$line[17],
 				'ex_RepeatVisual'=>$line[18],'ex_ExistingHydroMark'=>stripslashes($line[19]),'ex_NewHydroMark'=>stripslashes($line[20]),'ex_SignatoryUserName'=>stripslashes($line[21]),'ex_ExaminationDate'=>func_convert_date_format($line[22]),
 				'ex_PeriodicCertNo'=>$line[23],'ex_EmailedDate'=>func_convert_date_format($line[24]),'ex_ReminderDate'=>func_convert_date_format($line[25]), 
-				'ex_AbsenceReason'=>stripslashes($line[26]),'ex_ExistingHydroMarkText'=>stripslashes($line[27]), 'ex_NewHydroMarkText'=>stripslashes($line[28]),
-				'cu_Surname'=>stripslashes($line[29]), 'cu_Firstname'=>stripslashes($line[30]), 'cu_Address1'=>stripslashes($line[31]), 'cu_Email'=>stripslashes($line[32]),
-				'cy_Specifications'=>stripslashes($line[33]), 'cy_SerialNo'=>stripslashes($line[34]), 'cy_Material'=>$line[35] );
+				'ex_AbsenceReason'=>stripslashes($line[26]),'ex_ExistingHydroMarkText'=>base64_decode($line[27]), 'ex_NewHydroMarkText'=>base64_decode($line[28]), 'ex_Pdf'=>base64_decode($line[29]), 
+				'cu_Surname'=>stripslashes($line[30]), 'cu_Firstname'=>stripslashes($line[31]), 'cu_Address1'=>stripslashes($line[32]), 'cu_Email'=>stripslashes($line[33]),
+				'cy_Specifications'=>stripslashes($line[34]), 'cy_SerialNo'=>stripslashes($line[35]), 'cy_Material'=>$line[36] );
 		}
 
 		return $info;
@@ -1194,7 +1199,7 @@ class MySQLDB
 		$query = sprintf( "select ex_ExaminationNo,ex_CustomerNo,ex_CylinderNo,ex_PaintCondition,ex_Colour,ex_MinorScratches,ex_SeriousScratches,ex_ExternalPass,
 			ex_Notes,ex_InternalPass,ex_RingFitted,ex_RingColour,ex_TestPressure,ex_WaterCapacity,ex_MPE,ex_AccuracyVerified,ex_BuretReading,ex_HydrostaticPass,
 			ex_RepeatVisual,ex_ExistingHydroMark,ex_NewHydroMark,ex_SignatoryUserName,ex_ExaminationDate,ex_PeriodicCertNo,ex_EmailedDate,ex_ReminderDate,
-			ex_AbsenceReason,ex_ExistingHydroMarkText,ex_NewHydroMarkText  
+			ex_AbsenceReason,ex_ExistingHydroMarkText,ex_NewHydroMarkText,ex_Pdf,   
 			from examinations where ex_CustomerNo=%d order by ex_ExaminationDate",
 			$cust_no );
 		$result = $this->RunQuery( $query );
@@ -1202,9 +1207,9 @@ class MySQLDB
 		{
 			$info[] = array( 'ex_ExaminationNo'=>$line[0],'ex_CustomerNo'=>$line[1],'ex_CylinderNo'=>$line[2],'ex_PaintCondition'=>$line[3],'ex_Colour'=>$line[4],'ex_MinorScratches'=>$line[5],'ex_SeriousScratches'=>$line[6],'ex_ExternalPass'=>$line[7],
 				'ex_Notes'=>stripslashes($line[8]),'ex_InternalPass'=>$line[9],'ex_RingFitted'=>$line[10],'ex_RingColour'=>$line[11],'ex_TestPressure'=>$line[12],'ex_WaterCapacity'=>$line[13],'ex_MPE'=>$line[14],'ex_AccuracyVerified'=>$line[15],'ex_BuretReading'=>$line[16],'ex_HydrostaticPass'=>$line[17],
-				'ex_RepeatVisual'=>$line[18],'ex_ExistingHydroMark'=>$line[19],'ex_NewHydroMark'=>$line[20],'ex_SignatoryUserName'=>stripslashes($line[21]),'ex_ExaminationDate'=>func_convert_date_format($line[22]),
+				'ex_RepeatVisual'=>$line[18],'ex_ExistingHydroMark'=>base64_decode($line[19]),'ex_NewHydroMark'=>base64_decode($line[20]),'ex_SignatoryUserName'=>stripslashes($line[21]),'ex_ExaminationDate'=>func_convert_date_format($line[22]),
 				'ex_PeriodicCertNo'=>$line[23],'ex_EmailedDate'=>func_convert_date_format($line[24]),'ex_ReminderDate'=>func_convert_date_format($line[25]), 
-				'ex_AbsenceReason'=>stripslashes($line[26]),'ex_ExistingHydroMarkText'=>stripslashes($line[27]), 'ex_NewHydroMarkText'=>stripslashes($line[28]) );
+				'ex_AbsenceReason'=>stripslashes($line[26]),'ex_ExistingHydroMarkText'=>stripslashes($line[27]), 'ex_NewHydroMarkText'=>stripslashes($line[28]), 'ex_Pdf'=>base64_decode($line[29]) );
 		}
 
 		return $info;
@@ -1216,7 +1221,7 @@ class MySQLDB
 		$query = sprintf( "select ex_ExaminationNo,ex_CustomerNo,ex_CylinderNo,ex_PaintCondition,ex_Colour,ex_MinorScratches,ex_SeriousScratches,ex_ExternalPass,
 			ex_Notes,ex_InternalPass,ex_RingFitted,ex_RingColour,ex_TestPressure,ex_WaterCapacity,ex_MPE,ex_AccuracyVerified,ex_BuretReading,ex_HydrostaticPass,
 			ex_RepeatVisual,ex_ExistingHydroMark,ex_NewHydroMark,ex_SignatoryUserName,ex_ExaminationDate,ex_PeriodicCertNo,ex_EmailedDate,ex_ReminderDate,
-			ex_AbsenceReason,ex_ExistingHydroMarkText,ex_NewHydroMarkText  
+			ex_AbsenceReason,ex_ExistingHydroMarkText,ex_NewHydroMarkText,ex_Pdf,  
 			from examinations where ex_CylinderNo=%d order by ex_ExaminationDate",
 			$cyl_no );
 		$result = $this->RunQuery( $query );
@@ -1224,9 +1229,9 @@ class MySQLDB
 		{
 			$info[] = array( 'ex_ExaminationNo'=>$line[0],'ex_CustomerNo'=>$line[1],'ex_CylinderNo'=>$line[2],'ex_PaintCondition'=>$line[3],'ex_Colour'=>$line[4],'ex_MinorScratches'=>$line[5],'ex_SeriousScratches'=>$line[6],'ex_ExternalPass'=>$line[7],
 				'ex_Notes'=>$line[8],'ex_InternalPass'=>$line[9],'ex_RingFitted'=>$line[10],'ex_RingColour'=>$line[11],'ex_TestPressure'=>$line[12],'ex_WaterCapacity'=>$line[13],'ex_MPE'=>$line[14],'ex_AccuracyVerified'=>$line[15],'ex_BuretReading'=>$line[16],'ex_HydrostaticPass'=>$line[17],
-				'ex_RepeatVisual'=>$line[18],'ex_ExistingHydroMark'=>$line[19],'ex_NewHydroMark'=>$line[20],'ex_SignatoryUserName'=>$line[21],'ex_ExaminationDate'=>$line[22],
+				'ex_RepeatVisual'=>$line[18],'ex_ExistingHydroMark'=>base64_decode($line[19]),'ex_NewHydroMark'=>base64_decode($line[20]),'ex_SignatoryUserName'=>$line[21],'ex_ExaminationDate'=>$line[22],
 				'ex_PeriodicCertNo'=>$line[23],'ex_EmailedDate'=>$line[24],'ex_ReminderDate'=>$line[25], 'ex_AbsenceReason'=>stripslashes($line[26]),
-				'ex_ExistingHydroMarkText'=>stripslashes($line[27]), 'ex_NewHydroMarkText'=>stripslashes($line[28]) );
+				'ex_ExistingHydroMarkText'=>stripslashes($line[27]), 'ex_NewHydroMarkText'=>stripslashes($line[28]), 'ex_Pdf'=>base64_decode($line[29]) );
 		}
 
 		return $info;

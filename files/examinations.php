@@ -49,6 +49,7 @@ function func_clear_ex_array( &$ex_array )
 	$ex_array['ex_EmailedDate'] = "";
 	$ex_array['ex_ReminderDate'] = "";
 	$ex_array['ex_AbsenceReason'] = "";
+	$ex_array['ex_Pdf'] = "";
 	$ex_array['error_msg'] = "";
 	$ex_array['info_msg'] = "";
 	$ex_array['name_filter'] = "";
@@ -285,6 +286,8 @@ if ( isset( $_POST['ex_ReminderDate']) )
 }
 if ( isset($_POST['ex_AbsenceReason']) )
 	$ex_array['ex_AbsenceReason'] = $_POST['ex_AbsenceReason'];
+if ( isset($_POST['ex_Pdf']) )
+	$ex_array['ex_Pdf'] = base64_decode($_POST['ex_Pdf']);
 
 if ( $ex_array['ex_TestPressure'] == "" )
 {
@@ -332,7 +335,7 @@ else if ( isset($_GET['ex_ExaminationNo']) && $_GET['ex_ExaminationNo'] != 0 )
 	if ( ($line=$db->GetFields( 'examinations', 'ex_ExaminationNo', $ex_array['ex_ExaminationNo'], "ex_CustomerNo,ex_CylinderNo,ex_PaintCondition,ex_Colour,ex_MinorScratches,
 			ex_SeriousScratches,ex_ExternalPass,ex_Notes,ex_InternalPass,ex_RingFitted,ex_RingColour,ex_TestPressure,ex_WaterCapacity,ex_MPE,ex_AccuracyVerified,ex_BuretReading,
 			ex_HydrostaticPass,ex_RepeatVisual,ex_ExistingHydroMark,ex_NewHydroMark,ex_SignatoryUserName,ex_ExaminationDate,ex_PeriodicCertNo,ex_EmailedDate,ex_ReminderDate,
-			ex_AbsenceReason,ex_ExistingHydroMarkText,ex_NewHydroMarkText")) !== false )
+			ex_AbsenceReason,ex_ExistingHydroMarkText,ex_NewHydroMarkText,ex_Pdf")) !== false )
 	{	// success
 	    $ex_array['ex_CustomerNo'] = $line[0];
 		$ex_array['ex_CylinderNo'] = $line[1];
@@ -352,8 +355,8 @@ else if ( isset($_GET['ex_ExaminationNo']) && $_GET['ex_ExaminationNo'] != 0 )
 		$ex_array['ex_BuretReading'] = $line[15];
 		$ex_array['ex_HydrostaticPass'] = $line[16];
 		$ex_array['ex_RepeatVisual'] = $line[17];
-		$ex_array['ex_ExistingHydroMark'] = stripslashes($line[18]);
-		$ex_array['ex_NewHydroMark'] = stripslashes($line[19]);
+		$ex_array['ex_ExistingHydroMark'] = base64_decode($line[18]);
+		$ex_array['ex_NewHydroMark'] = base64_decode($line[19]);
 		$ex_array['ex_SignatoryUserName'] = stripslashes($line[20]);
 		$ex_array['ex_ExaminationDate'] = func_convert_date_format($line[21]);
 		$ex_array['ex_PeriodicCertNo'] = (intval($line[22]) > 0 ? $line[22] : "");
@@ -362,6 +365,7 @@ else if ( isset($_GET['ex_ExaminationNo']) && $_GET['ex_ExaminationNo'] != 0 )
 		$ex_array['ex_AbsenceReason'] = stripslashes($line[25]);
 		$ex_array['ex_ExistingHydroMarkText'] = stripslashes($line[26]);
 		$ex_array['ex_NewHydroMarkText'] = stripslashes($line[27]);
+		$ex_array['ex_Pdf'] = base64_decode($line[28]);
 
 		$ex_array['ex_ExternalFail'] = ($ex_array['ex_ExternalPass'] == "Y" ? "N" : "Y");
 		$ex_array['ex_InternalFail'] = ($ex_array['ex_InternalPass'] == "Y" ? "N" : "Y");
@@ -423,7 +427,7 @@ else if ( isset($_POST['NewExamination']) || isset($_POST['UpdateExamination']) 
 		if ( $exam_no=$db->UpdateExaminationsTable( $new_exam, $ex_array['ex_ExaminationNo'], $ex_array['ex_CustomerNo'], $ex_array['ex_CylinderNo'],$ex_array['ex_PaintCondition'],$ex_array['ex_Colour'],$ex_array['ex_MinorScratches'],
 			$ex_array['ex_SeriousScratches'],$ex_array['ex_ExternalPass'],$ex_array['ex_Notes'],$ex_array['ex_InternalPass'],$ex_array['ex_RingFitted'],$ex_array['ex_RingColour'],$ex_array['ex_TestPressure'],$ex_array['ex_WaterCapacity'],$ex_array['ex_MPE'],$ex_array['ex_AccuracyVerified'],$ex_array['ex_BuretReading'],
 			$ex_array['ex_HydrostaticPass'],$ex_array['ex_RepeatVisual'],$ex_array['ex_ExistingHydroMark'],$ex_array['ex_NewHydroMark'],$ex_array['ex_SignatoryUserName'],$ex_array['ex_ExaminationDate'],$ex_array['ex_PeriodicCertNo'],$ex_array['ex_EmailedDate'],$ex_array['ex_ReminderDate'],
-			$ex_array['ex_AbsenceReason'], $ex_array['ex_ExistingHydroMarkText'], $ex_array['ex_NewHydroMarkText'] ) )
+			$ex_array['ex_AbsenceReason'], $ex_array['ex_ExistingHydroMarkText'], $ex_array['ex_NewHydroMarkText'], $ex_array['ex_Pdf'] ) )
 		{	// success
 			//func_clear_ex_array( $ex_array );
 			if ( $new_exam )
@@ -1060,9 +1064,11 @@ if ( $new_exam && $ex_array['ex_ExaminationDate'] == "" )
             printf( "<button type='submit' class='btn btn-outline-dark' name='ClearExamination' id='ClearExamination' value='Clear'>Clear</button>" );
             printf( "&nbsp;&nbsp;&nbsp;" );
             printf( "<button type='submit' class='btn btn-outline-dark' name='GeneratePdf' id='GeneratePdf' value='GeneratePdf'>Generate PDF</button>" );
-			if ( file_exists("report.pdf") )
+			if ( strlen($ex_array['ex_Pdf']) > 0 )
 			{
-				printf( "&nbsp;<a href='report.pdf' target='_blank'>View PDF</a>");
+				printf( "<input type='hidden' id='ex_Pdf' name='ex_Pdf' value='%s'>", base64_encode($ex_array['ex_Pdf']) );
+				file_put_contents( "report.pdf", $ex_array['ex_Pdf'] );
+				printf( "&nbsp;<a href='files/display_pdf.php?pdf=../report.pdf' target='_blank' rel='noopener noreferrer'>View PDF</a>" );
 			}
 			printf( "&nbsp;&nbsp;&nbsp;" );
 			$disabled = "";

@@ -6,7 +6,7 @@
 //
 //--------------------------------------------------------------------------------------
 
-function CreatePdf( $db, $ex_array )
+function CreatePdf( $db, &$ex_array )
 {
 	$user = $db->SelectUser( $_SESSION['us_Username'] );
 	$customer = $db->ReadCustomers( $ex_array['ex_CustomerNo'], "" );
@@ -308,7 +308,7 @@ issued if a cylinder fails the Periodic Test.  The action to be taken in the eve
 
 
 
-	$pdf->Output( 'F','report.pdf' );
+	$ex_array['ex_Pdf'] = $pdf->Output( 'S' );
 }
 
 

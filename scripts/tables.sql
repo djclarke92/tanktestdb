@@ -111,6 +111,7 @@ create TABLE IF NOT EXISTS `examinations` (
 	`ex_AbsenceReason` varchar(255) NOT NULL default '',			#
 	`ex_ExistingHydroMarkText` varchar(50) NOT NULL default '',		#
 	`ex_NewHydroMarkText` varchar(50) NOT NULL default '',			#
+	`ex_Pdf` blob NOT NULL default '',								# PDF document
 	PRIMARY KEY (`ex_ExaminationNo`),
 	KEY `ex_CylinderNoIndex` (`ex_CylinderNo`)
 );
