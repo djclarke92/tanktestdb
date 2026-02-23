@@ -60,7 +60,7 @@ function func_check_cy_array( &$cy_array )
 		$cy_array['error_msg'] = "You must enter the LAB No.";
 		return false;
 	}
-	else if ( $cy_array['cy_ManufactureDate'] == "" )
+	else if ( $cy_array['cy_ManufactureDate'] == "" || !func_is_date_valid($cy_array['cy_ManufactureDate']) )
 	{
 		$cy_array['error_msg'] = "You must enter the Date of Manufacture.";
 		return false;

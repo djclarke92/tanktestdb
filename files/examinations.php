@@ -108,7 +108,7 @@ function func_check_ex_array( &$ex_array )
 		$ex_array['error_msg'] = "You must enter the Periodic Certificate Number.";
 		return false;
 	}
-	else if ( $ex_array['ex_ExaminationDate'] == "" )
+	else if ( $ex_array['ex_ExaminationDate'] == "" || !func_is_date_valid($ex_array['ex_ExaminationDate']) )
 	{
 		$ex_array['error_msg'] = "You must enter the Examination Date.";
 		return false;
@@ -165,9 +165,17 @@ $new_exam = false;
 
 
 if ( isset($_POST['DateSearch']) && isset($_POST['StartDate']) )
+{
 	$ex_array['start_date'] = $_POST['StartDate'];
+	if ( !func_is_date_valid($ex_array['start_date']))
+		$ex_array['start_date'] = "";
+}
 if ( isset($_POST['DateSearch']) && isset($_POST['EndDate']) )
+{
 	$ex_array['end_date'] = $_POST['EndDate'];
+	if ( !func_is_date_valid($ex_array['end_date']) )
+		$ex_array['end_date'] = "";
+}
 if ( isset($_POST['NameSearch']) && isset($_POST['NameFilter']) )
 {
 	$ex_array['name_filter'] = $_POST['NameFilter'];
@@ -256,13 +264,25 @@ if ( isset( $_POST['ex_NewHydroMark']) )
 if ( isset( $_POST['ex_SignatoryUserName']) )
 	$ex_array['ex_SignatoryUserName'] = $_POST['ex_SignatoryUserName'];
 if ( isset( $_POST['ex_ExaminationDate']) )
+{
 	$ex_array['ex_ExaminationDate'] = $_POST['ex_ExaminationDate'];
+	if ( !func_is_date_valid($ex_array['ex_ExaminationDate']) )
+		$ex_array['ex_ExaminationDate'] = "";
+}
 if ( isset( $_POST['ex_PeriodicCertNo']) )
 	$ex_array['ex_PeriodicCertNo'] = $_POST['ex_PeriodicCertNo'];
 if ( isset( $_POST['ex_EmailedDate']) )
+{
 	$ex_array['ex_EmailedDate'] = $_POST['ex_EmailedDate'];
+	if ( !func_is_date_valid($ex_array['ex_EmailedDate']) )
+		$ex_array['ex_EmailedDate'] = "";
+}
 if ( isset( $_POST['ex_ReminderDate']) )
+{
 	$ex_array['ex_ReminderDate'] = $_POST['ex_ReminderDate'];
+	if ( !func_is_date_valid($ex_array['ex_ReminderDate']) )
+		$ex_array['ex_ReminderDate'] = "";
+}
 if ( isset($_POST['ex_AbsenceReason']) )
 	$ex_array['ex_AbsenceReason'] = $_POST['ex_AbsenceReason'];
 

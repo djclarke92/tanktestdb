@@ -2,13 +2,13 @@
 #
 #-----------------------------------------------------------------------
 #
-# TankTest release package script for raspberry pi
+# TankTestDB release package script for raspberry pi
 #
 #-----------------------------------------------------------------------
 #
-# script to roll up a new release of TankTest
+# script to roll up a new release of TankTestDB
 
-SRCFILE=./tanktest-$1.tgz
+SRCFILE=./tanktestdb-$1.tgz
 DEST=0
 PKG=Y
 
@@ -40,19 +40,24 @@ fi
 echo ""
 if [[ "$DEST" != 0 ]]; then
 	for CC in $DEST; do
-		PI=djclarek@$CC
+		PI=djclarke@$CC
 		echo "-> Copying new version to ${PI}"
-		if [ $CC = "localhost" -a -d /var/www/html/tanktest ]; then
-			tar xvf ${SRCFILE}  -C /var/www/html/tanktest
+		if [ $CC = "localhost" -a -d /var/www/html/tanktestdb ]; then
+			tar xvf ${SRCFILE}  -C /var/www/html/tanktestdb
 			if [ $? != 0 ]; then
-				echo "-> Error: failed to copy new package to /var/www/html/tanktest"
+				echo "-> Error: failed to copy new package to /var/www/html/tanktestdb"
 			fi
 		else
-			scp ${SRCFILE} ${PI}:/var/www/html 2>/dev/null
+			scp ${SRCFILE} ${PI}:/var/www/tanktestdb.nz 2>/dev/null
 			if [ $? != 0 ]; then
-				scp ${SRCFILE} ${PI}:/var/www/tanktest
+				scp ${SRCFILE} ${PI}:~/.
 				if [ $? != 0 ]; then
 					echo "-> Error: failed to copy new package to ${PI}"
+				else
+					ssh ${PI} "(cd /var/www/tanktestdb.nz; tar -xvzf ~/${SRCFILE} --overwrite)"
+					if [ $? != 0 ]; then
+						echo "-> Error untaring ${SRCFILE}"
+					fi
 				fi
 			fi
 		fi

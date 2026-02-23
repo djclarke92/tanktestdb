@@ -66,9 +66,9 @@ create TABLE IF NOT EXISTS `cylinders` (
 
 # table of cylinder types
 create TABLE IF NOT EXISTS `cylindertypes` (
-	`cc_CylinderType` char(2) NOT NULL,							# ST, AL, CF
+	`ct_CylinderType` char(2) NOT NULL,							# ST, AL, CF
 	`ct_Description` varchar(20) NOT NULL default'',			# Steel, Aluminium, Carbon Fibre
-	PRIMARY KEY (`cc_CylinderType`)
+	PRIMARY KEY (`ct_CylinderType`)
 );
 
 # table of cylinder checks

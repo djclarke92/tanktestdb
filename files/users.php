@@ -482,7 +482,7 @@ $user_list = $db->ReadUsers();
 			printf( "<div class='col'>" );
             printf( "<button type='submit' class='btn btn-outline-dark' name='UpdateUser' id='UpdateUser' value='Update' %s>Update</button>", ($us_array['us_Username'] == "" ? "disabled" : "") );
             printf( "&nbsp;&nbsp;&nbsp;" );
-            printf( "<button type='submit' class='btn btn-outline-dark' name='NewUser' id='NewUser' value='New' %s>New</button>", ($us_array['us_Username'] != "" || func_disabled_non_admin() ? "disabled" : "") );
+            printf( "<button type='submit' class='btn btn-outline-dark' name='NewUser' id='NewUser' value='New' %s>New</button>", ((!$new_user && $us_array['us_Username'] != "") || func_disabled_non_admin() ? "disabled" : "") );
             printf( "&nbsp;&nbsp;&nbsp;" );
             $onclick = sprintf( "return confirm(\"Are you sure you want to delete user with username %s ?\")", $us_array['us_Username'] );
             printf( "<button type='submit' class='btn btn-outline-dark' name='DeleteUser' id='DeleteUser' value='Delete' onclick='%s' %s>Delete</button>", $onclick, 
