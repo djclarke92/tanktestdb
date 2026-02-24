@@ -323,12 +323,18 @@ if ( isset($ex_array['ex_CylinderNo']) )
 	}
 } 
         
-
 if ( isset( $_POST['GeneratePdf']) )
 {
 	CreatePdf( $db, $ex_array );
-} 
-else if ( isset($_GET['ex_ExaminationNo']) && $_GET['ex_ExaminationNo'] != 0 )
+
+	// force a save
+	if ( $new_exam )
+		$_POST['NewExamination'] = true;
+	else
+		$_POST['UpdateExamination'] = true;
+} // allow the new/update
+
+if ( isset($_GET['ex_ExaminationNo']) && $_GET['ex_ExaminationNo'] != 0 )
 {
 	$ex_array['ex_ExaminationNo'] = $_GET['ex_ExaminationNo'];
 
@@ -452,8 +458,10 @@ else if ( isset($_POST['NewExamination']) || isset($_POST['UpdateExamination']) 
 				}
 			}
 
-			// consume the periodic cert no
-			$db->SetNextPeriodicCertNo();
+			if ( $new_exam )
+			{	// consume the periodic cert no
+				$db->SetNextPeriodicCertNo();
+			}
 
 			$ex_array['info_msg'] = "Examination details saved successfully.";
 			$new_exam = false;
@@ -470,7 +478,10 @@ else if ( isset($_POST['ClearExamination']) )
 }
 else if ( isset($_POST['EmailPdf']) )
 {
+	$customers = $db->ReadCustomers( $ex_array['ex_CustomerNo'], "" );
+	$user - $db->SelectUser( $_SESSION['us_Username'] );
 
+	func_email_examination_pdf( $ex_array, $customers, $user );
 }
 
 $cylinderchecks_list = $db->ReadCylinderChecks(0,"");
@@ -1064,12 +1075,13 @@ if ( $new_exam && $ex_array['ex_ExaminationDate'] == "" )
             printf( "<button type='submit' class='btn btn-outline-dark' name='ClearExamination' id='ClearExamination' value='Clear'>Clear</button>" );
             printf( "&nbsp;&nbsp;&nbsp;" );
             printf( "<button type='submit' class='btn btn-outline-dark' name='GeneratePdf' id='GeneratePdf' value='GeneratePdf'>Generate PDF</button>" );
-			if ( strlen($ex_array['ex_Pdf']) > 0 )
-			{
-				printf( "<input type='hidden' id='ex_Pdf' name='ex_Pdf' value='%s'>", base64_encode($ex_array['ex_Pdf']) );
-				file_put_contents( "report.pdf", $ex_array['ex_Pdf'] );
-				printf( "&nbsp;<a href='files/display_pdf.php?pdf=../report.pdf' target='_blank' rel='noopener noreferrer'>View PDF</a>" );
-			}
+			printf( "<input type='hidden' id='ex_Pdf' name='ex_Pdf' value='%s'>", base64_encode($ex_array['ex_Pdf']) );
+			printf( "&nbsp;&nbsp;&nbsp;" );
+
+			$file = sprintf( "report-%06d.pdf", $ex_array['ex_ExaminationNo'] );
+			file_put_contents( $file, $ex_array['ex_Pdf'] );
+			printf( "<a href='files/display_pdf.php?pdf=../%s' target='_blank' rel='noopener noreferrer'>View PDF</a>", $file );		
+
 			printf( "&nbsp;&nbsp;&nbsp;" );
 			$disabled = "";
 			if ( $ex_array['ex_EmailedDate'] != "" || $customers[0]['cu_Email'] == "" )

@@ -58,7 +58,7 @@ function CreatePdf( $db, &$ex_array )
 	$txt = sprintf( "%s, %s, %s", $user['us_Address1'], $user['us_Address2'], $user['us_Address3'] );
 	$pdf->Cell( 80, 6, $txt, 0, 1, 'L' );
 
-	$pdf->ln(4);
+	$pdf->ln(1);
 
 	// new line
 	$pdf->SetFont('Arial','B',12);
@@ -66,7 +66,7 @@ function CreatePdf( $db, &$ex_array )
 	$pdf->Cell( 35, 6, $txt, 0, 0, 'L' );
 	$pdf->SetFont('Arial','',12);
 	$txt = sprintf( "%s %s", $customer[0]['cu_Firstname'], $customer[0]['cu_Surname'] );
-	$pdf->Cell( 40, 6, $txt, 0, 0, 'L' );
+	$pdf->Cell( 60, 6, $txt, 0, 0, 'L' );
 
 	$pdf->SetFont('Arial','B',12);
 	$txt = sprintf( "Phone:" );
@@ -107,10 +107,16 @@ function CreatePdf( $db, &$ex_array )
 	$txt = sprintf( "Date of Manufacture: %s", $cylinders[0]['cy_ManufactureDate'] );
 	$pdf->Cell( 60, 6, $txt, 0, 1, 'L' );
 
-	$pdf->ln(4);
+	// new line
+	$pdf->SetFont('Arial','',12);
+	$txt = sprintf( "  Reason for absence: %s", $ex_array['ex_AbsenceReason'] );
+	$pdf->Cell( 150, 6, $txt, 0, 0, 'L' );
+
 	
 	// new line
-	$pdf->Rect( 10, 79, 190, 25 );
+	$pdf->Rect( 10, 81, 190, 25 );
+
+	$pdf->SetXY( 12, 82 );
 	$pdf->SetFont('Arial','B',12);
 	$txt = sprintf( "  External Examination" );
 	$pdf->Cell( 30, 6, $txt, 0, 1, 'L' );
@@ -139,7 +145,7 @@ function CreatePdf( $db, &$ex_array )
 	$pdf->ln(4);
 
 	// new line
-	$pdf->Rect( 10, 107, 190, 50 );
+	$pdf->Rect( 10, 109, 190, 49 );
 	$pdf->SetFont('Arial','B',12);
 	$txt = sprintf( "  Internal Examination" );
 	$pdf->Cell( 30, 6, $txt, 0, 1, 'L' );
@@ -156,9 +162,9 @@ function CreatePdf( $db, &$ex_array )
 		$pdf->SetFont('Arial','',12);
 		$txt = sprintf( "%s: %s", $insp['cc_Description'], ($insp['in_CheckPositive'] == "Y" ? "Yes" : "No") );
 		if ( $left )
-			$pdf->SetXY( 30, 113.7+6*$count );
+			$pdf->SetXY( 30, 115.7+6*$count );
 		else
-			$pdf->SetXY( 110, 113.7+6*$count );
+			$pdf->SetXY( 110, 115.7+6*$count );
 		$pdf->Cell( 30, 6, $txt, 0, 2, 'L' );
 
 		if ( $left )

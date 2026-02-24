@@ -1160,6 +1160,18 @@ class MySQLDB
 	    return false;	
 	}
 
+	function SaveExaminationPdf( $exam_no, $pdf )
+	{
+		$query = sprintf( "update examinations set ex_pdf='%s' where ex_ExaminationNo=%d", base64_encode($pdf), $exam_no );
+		$result = $this->RunQuery( $query );
+	    if ( mysqli_affected_rows($this->db_link) >= 0 )
+	    {	// success
+	        return true;
+	    }
+	    
+	    return false;	
+	}
+
 	function ReadExaminations( $exam_no, $start_date, $end_date )
 	{
 		$info = array();

@@ -405,6 +405,11 @@ printf( "<form action='%s' enctype='multipart/form-data' method='post' class='fo
         
     case "Home":
         include("./files/home.php");
+
+        $pattern = 'report-*.pdf';
+
+           // Delete all files with the specified extension in the folder
+        array_map('unlink', glob($pattern)); 
         break;
 
     case "Customers":
