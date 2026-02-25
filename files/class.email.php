@@ -19,13 +19,13 @@ function func_email_examination_pdf( $ex_array, $exam_cylinder, $customers, $use
 	$subject = sprintf( "Cylinder Examination Document from %s", $user['us_StationName'] );
 			
 	$message = "";
-	$message .= sprintf( "Hi %s,<br><br>", $customers[0]['cu_Firstname'] );
-	$message .= sprintf( "Atttached to this email is your Cylinder Document of Certification for the <b>%s</b> cylinder with Serial No. <b>%s</b>.<br><br>", 
+	$message .= sprintf( "Hi %s,<br>", $customers[0]['cu_Firstname'] );
+	$message .= sprintf( "<p>Atttached to this email is your Cylinder Document of Certification for the <b>%s</b> cylinder with Serial No. <b>%s</b>.</p>", 
 		$exam_cylinder[0]['cy_Manufacturer'], $exam_cylinder[0]['cy_SerialNo'] );
 
 	$message .= "<p>" . $_SESSION['regulations'] . "</p>";
 
-	$message .= sprintf( "Have a great day !<br>%s", $user['us_Name'] );
+	$message .= sprintf( "<p>Have a great day !<br>%s</p>", $user['us_Name'] );
 	
 	
 
@@ -38,8 +38,8 @@ function func_email_examination_pdf( $ex_array, $exam_cylinder, $customers, $use
 		$mail->isSMTP();                                            //Send using SMTP
 		$mail->Host       = 'MP.MAIL.ISX.NET.NZ';                     //Set the SMTP server to send through
 		$mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-		$mail->Username   = 'pi@flatcatit.co.nz';                     //SMTP username
-		$mail->Password   = 'fc.py880R@5p';                               //SMTP password
+		$mail->Username   = SMTP_USERNAME;                     //SMTP username
+		$mail->Password   = SMTP_PASSWORD;                               //SMTP password
 		$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
 		$mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
 
