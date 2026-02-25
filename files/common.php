@@ -201,7 +201,20 @@ function func_is_date_valid( $d1 )
 		return false;
 }
 
+function func_show_bgcolour()
+{
+	return "";
+}
 
+function func_show_bgimage()
+{
+	return "";
+}
+
+function func_get_website_logo( $logo )
+{
+	return sprintf( "<img src='./images/%s'>", $logo );
+}
 
 class MySQLDB
 {

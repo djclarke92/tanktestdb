@@ -479,9 +479,13 @@ else if ( isset($_POST['ClearExamination']) )
 else if ( isset($_POST['EmailPdf']) )
 {
 	$customers = $db->ReadCustomers( $ex_array['ex_CustomerNo'], "" );
-	$user - $db->SelectUser( $_SESSION['us_Username'] );
+	$user = $db->SelectUser( $_SESSION['us_Username'] );
+	$exam_cylinder = $db->ReadCylinders( $ex_array['ex_CylinderNo'], 0, "" );
 
-	func_email_examination_pdf( $ex_array, $customers, $user );
+	if ( func_email_examination_pdf( $ex_array, $exam_cylinder, $customers, $user ) === true )
+		$ex_array['info_msg'] = sprintf( "email sent successfully" );
+	else
+		$ex_array['error_msg'] = sprintf( "error sending email" );
 }
 
 $cylinderchecks_list = $db->ReadCylinderChecks(0,"");

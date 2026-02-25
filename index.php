@@ -6,6 +6,7 @@
 //
 //--------------------------------------------------------------------------------------
 
+
 session_start();
 include_once( "files/common.php" );
 include_once( "files/commonhtml.php" );
@@ -15,9 +16,18 @@ include_once( "files/createpdf.php" );
 
 func_session_init();
 
+//Load Composer's autoloader (created by composer, not included with PHPMailer)
+require 'vendor/autoload.php';
+require 'vendor/phpmailer/phpmailer/src/PHPMailer.php';
+require 'vendor/phpmailer/phpmailer/src/SMTP.php';
+require 'vendor/phpmailer/phpmailer/src/Exception.php';
+
 
 $_SESSION['bootstrap'] = true;
-
+$_SESSION['regulations'] = sprintf( "This Document of Certification must be retained by the cylinder owner and should be produced if required by an 
+inspector under the Health and Safety at Work Act 2015, or the cylinder filler. A Document of Certification cannot be 
+issued if a cylinder fails the Periodic Test.  The action to be taken in the event of a failure is set out in regulations 
+15.56, 15.57 and 15.58 of the Health an Safety at Work (Hazardous Substances) Regulations 2017.");
 
 if ( isset($_SERVER['HTTP_AUTHORIZATION']) )
 {
